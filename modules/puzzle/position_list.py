@@ -21,11 +21,20 @@ class position_list:
         self.strict = strict
 
     def move_list(self):
+        # If there is no better move, return empty list
+        if self.best_move is None:
+            return []
+            
+        # If it is the losing side's turn (player_turn=False) and this would be the last move
+        # in the sequence, simply do not include it in the list
+        if not self.player_turn and (self.next_position is None or 
+                                    self.next_position.ambiguous() or 
+                                    self.next_position.position.is_game_over()):
+            return []
+        
+        # Normal case - this move should be included
         if self.next_position is None or self.next_position.ambiguous() or self.next_position.position.is_game_over():
-            if self.best_move is not None:
-                return [self.best_move.move.uci()]
-            else:
-                return []
+            return [self.best_move.move.uci()]
         else:
             return [self.best_move.move.uci()] + self.next_position.move_list()
 
